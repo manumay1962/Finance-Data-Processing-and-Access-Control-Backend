@@ -247,28 +247,3 @@ curl -X POST http://localhost:3000/api/records \
 
 **Response:** `403 Forbidden — Access denied`
 
-## Engineering Approach & Design Decisions
-
-This backend was built with a core philosophy: **Structure and clarity over unnecessary complexity.**
-
-1. **Architecture & Separation of Concerns**: 
-   The app follows a strict `Route → Middleware → Controller → Service → DB` flow. Controllers only handle HTTP concerns (req/res), while Services encapsulate all business logic. This makes the codebase highly testable, readable, and easy to extend.
-
-2. **Why SQLite? (Valuing Practicality)**: 
-   For an assessment/MVP, introducing a separate MongoDB or PostgreSQL instance adds deployment friction and local setup overhead. SQLite provides zero-config file-based storage while still allowing powerful, real SQL aggregation queries (like grouping monthly trends via `strftime`), proving relational database competency without the bloated setup.
-
-3. **Access Control (RBAC) Strategy**: 
-   Instead of scattering `if (user.role !== 'admin')` checks inside business logic, RBAC is handled as a declarative middleware factory (`authorize('admin', 'analyst')`). This keeps routes self-documenting and strictly enforces security at the boundary layer.
-
-4. **Defensive Programming & Validation**: 
-   All incoming payloads are validated using `express-validator` before reaching the controllers. If validation fails, a generic validation middleware catches it and returns a standardized `400 Bad Request`. A global error handler catches any database constraints or unhandled exceptions, ensuring the server never crashes and always returns structured JSON.
-
-5. **Soft Deletes for Financial Data**: 
-   In FinTech systems, audit trails are critical. Financial records use a `deleted_at` timestamp rather than a destructive `DELETE` operation, ensuring historical stability.
-
-6. **Standardized API Responses**: 
-   Every endpoint across the application returns a predictable `{ success, message, data (or errors) }` object. This creates a reliable contract for any frontend consuming this API.
-
-## Valid Categories
-
-`salary`, `freelance`, `investment`, `rental`, `food`, `transport`, `utilities`, `entertainment`, `healthcare`, `education`, `shopping`, `travel`, `other`
