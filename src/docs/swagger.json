@@ -1,0 +1,244 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Finance Dashboard API",
+    "version": "1.0.0",
+    "description": "API documentation. Important endpoints below. JWT Token required for secured routes."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new Viewer user",
+        "tags": ["Authentication"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login to get JWT Token",
+        "tags": ["Authentication"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "admin@finance.com" },
+                  "password": { "type": "string", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/dashboard/summary": {
+      "get": {
+        "summary": "Get total income, expenses, and net balance",
+        "tags": ["Dashboard"],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/dashboard/category-totals": {
+      "get": {
+        "summary": "Get category totals",
+        "tags": ["Dashboard"],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/dashboard/trends": {
+      "get": {
+        "summary": "Monthly trends for a year",
+        "tags": ["Dashboard"],
+        "parameters": [ { "name": "year", "in": "query", "schema": { "type": "integer", "example": 2026 } } ],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/dashboard/recent-activity": {
+      "get": {
+        "summary": "View recent financial records",
+        "tags": ["Dashboard"],
+        "parameters": [ { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } } ],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/records": {
+      "get": {
+        "summary": "Retrieve records (with filters) [Analyst/Admin]",
+        "tags": ["Financial Records"],
+        "parameters": [
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["income", "expense"] } },
+          { "name": "category", "in": "query", "schema": { "type": "string", "example": "salary" } },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "example": "2026-01-01" }, "description": "YYYY-MM-DD" },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "example": "2026-12-31" }, "description": "YYYY-MM-DD" },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "post": {
+        "summary": "Creates a new financial record [Admin]",
+        "tags": ["Financial Records"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "example": 1000 },
+                  "type": { "type": "string", "enum": ["income", "expense"], "example": "income" },
+                  "category": { "type": "string", "example": "freelance" },
+                  "date": { "type": "string", "example": "2026-04-01" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/api/records/{id}": {
+      "get": {
+        "summary": "Get a specific record [Analyst/Admin]",
+        "tags": ["Financial Records"],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "put": {
+        "summary": "Update a financial record [Admin]",
+        "tags": ["Financial Records"],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": { "type": "number", "example": 1500 },
+                  "type": { "type": "string", "enum": ["income", "expense"], "example": "income" },
+                  "category": { "type": "string", "example": "freelance" },
+                  "date": { "type": "string", "example": "2026-04-15" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      },
+      "delete": {
+        "summary": "Soft delete a record [Admin]",
+        "tags": ["Financial Records"],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "List all users [Admin]",
+        "tags": ["User Management"],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/users/{id}/role": {
+      "patch": {
+        "summary": "Update user role [Admin]",
+        "tags": ["User Management"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": { "type": "string", "enum": ["viewer", "analyst", "admin"], "example": "analyst" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/users/{id}/status": {
+      "patch": {
+        "summary": "Activate/Deactivate user [Admin]",
+        "tags": ["User Management"],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "enum": ["active", "inactive"], "example": "inactive" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Get user by ID [Admin]",
+        "tags": ["User Management"],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "200": { "description": "Success" } }
+      },
+      "delete": {
+        "summary": "Delete a user [Admin]",
+        "tags": ["User Management"],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "200": { "description": "Success" } }
+      }
+    }
+  }
+}
