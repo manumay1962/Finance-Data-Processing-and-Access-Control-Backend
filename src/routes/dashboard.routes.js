@@ -11,12 +11,12 @@ router.use(authenticate);
 router.get('/summary', dashboardController.getSummary);
 
 // categories
-router.get('/category-totals', authorize('viewer', 'analyst', 'admin'), dashboardController.getCategoryTotals);
+router.get('/category-totals', authorize('analyst', 'admin'), dashboardController.getCategoryTotals);
 
 // trends
-router.get('/trends', authorize('viewer', 'analyst', 'admin'), dashboardController.getMonthlyTrends);
+router.get('/trends', authorize('analyst', 'admin'), dashboardController.getMonthlyTrends);
 
 // recents
-router.get('/recent-activity', authorize('viewer', 'analyst', 'admin'), dashboardController.getRecentActivity);
+router.get('/recent-activity', authorize('analyst', 'admin'), dashboardController.getRecentActivity);
 
 module.exports = router;
